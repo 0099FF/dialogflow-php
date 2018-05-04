@@ -1,7 +1,19 @@
 {
+    "name": "0099FF/dialogflowphp",
+    "description": "A PHP-SDK for V1 of the Dialogflow API",
+    "keywords": ["dialogflow", "ai"],
+    "type": "package",
+    "license": "MIT",
+    "authors": [{
+        "name": "Jarrod Williams",
+        "homepage": "https://github.com/0099FF",
+        "role": "developer"
+    }],
     "autoload": {
         "psr-4": {
             "DialogflowPHP\\" : "DialogflowPHP/"
         }
-    }
+    },
+    "version": "0.1",
+    "minimum-stability": "dev"
 }
