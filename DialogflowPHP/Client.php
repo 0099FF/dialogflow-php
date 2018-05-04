@@ -4,7 +4,6 @@ namespace DialogflowPHP;
 
 use DialogflowPHP\Exceptions\ClientException;
 
-
 class Client
 {
 
@@ -26,7 +25,7 @@ class Client
 
 
     /**
-     * Initialises a new client object capable of querying a Dialogflow agent.
+     * Initialises a new client object qualified to query a Dialogflow agent.
      *
      * @param string        $_token     The developer access token for the agent.
      * @param string|number $_sessionId Current session id.
@@ -43,7 +42,7 @@ class Client
             self::_validateToken($_token);
             $this->_token = $_token;
             $this->_sessionId = $_sessionId;
-        }
+        }        
     }
 
 
@@ -70,25 +69,36 @@ class Client
     /**
      * Poses a question to the agent and returns the response.
      *
-     * @param string $query Question to pose to agent.
+     * @param string  $query          Question to pose to agent.
+     * @param boolean $return_as_json Return agent output as JSON string.
      * 
-     * @return void
+     * @return array|string Agent output as a an associative array or JSON string.
      * @todo   Error code checking, language selection.
      */
-    public function query($query) {
+    public function query($query, $return_as_json=false) 
+    {
+        $curl = curl_init('https://api.dialogflow.com/v1/query?v=20170712');
+        curl_setopt($curl, CURLOPT_POST, 1);
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER, array(
+                'Content-Type: application/json', 
+                'Authorization: Bearer '.$this->_token
+            )
+        );
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $data = array(
             'query' => array($query), 'lang' => 'en',
             'sessionId' => $this->_sessionId
         );
-        $ch = curl_init('https://api.api.ai/v1/query?v=20170712');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer '.$this->_token));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result = json_decode(curl_exec($ch));
-        curl_close($ch);
-        return $result;
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        $response = curl_exec($curl);
+        curl_close($curl);
+        if ($return_as_json) {
+            return $response;
+        }
+        return json_decode($response);
     }
+
 }
 
 ?>
