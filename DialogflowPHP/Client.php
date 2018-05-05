@@ -21,18 +21,18 @@ class Client
      * @var    string
      * @access private
      */
-    private $_sessionId;
+    private $_session_id;
 
 
     /**
      * Initialises a new client object qualified to query a Dialogflow agent.
      *
      * @param string        $_token     The developer access token for the agent.
-     * @param string|number $_sessionId Current session id.
+     * @param string|number $_session_id Current session id.
      * 
      * @throws ClientException When no $_token is provided.
      */
-    public function __construct($_token = null, $_sessionId = 0)
+    public function __construct($_token = null, $_session_id = 0)
     {
         if ($_token === null) {
             $msg = 'No token provided. Interaction with an agent requires its ' /
@@ -41,7 +41,7 @@ class Client
         } else {
             self::_validateToken($_token);
             $this->_token = $_token;
-            $this->_sessionId = $_sessionId;
+            $this->_session_id = $_session_id;
         }        
     }
 
@@ -88,7 +88,7 @@ class Client
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $data = array(
             'query' => array($query), 'lang' => 'en',
-            'sessionId' => $this->_sessionId
+            'sessionId' => $this->_session_id
         );
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($curl);
