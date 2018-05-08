@@ -80,27 +80,45 @@ class Client
      * Poses a question to the agent and returns the response.
      *
      * @param string  $query          Question to pose to agent.
+     * @param array   $parameters     Addition parameters for query.
      * @param boolean $return_as_json Return agent output as JSON string.
      * 
      * @return array|string Agent output as a an associative array or JSON string.
      * @todo   Error code checking, language selection.
      */
-    public function query($query, $return_as_json=false) 
+    public function query($query, $parameters=[], $return_as_json=false) 
     {
-        $curl = curl_init('https://api.dialogflow.com/v1/query?v=20170712');
-        curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt(
-            $curl, CURLOPT_HTTPHEADER, array(
-                'Content-Type: application/json', 
-                'Authorization: Bearer '.$this->_token
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl, array(
+                CURLOPT_RETURNTRANSFER=>true,
+                CURLOPT_URL=>'https://api.dialogflow.com/v1/query?v='.
+                    $this->_protocol_version,
+                CURLOPT_HTTPHEADER=>array(
+                    'Content-Type: application/json', 
+                    'Authorization: Bearer '.$this->_token
+                ),
+                CURLOPT_POST=>true,
+                CURLOPT_POSTFIELDS=>json_encode(
+                    array(
+                        // 'entities'=> '',
+                        'lang'=> isset(
+                            $parameters['lang']
+                        ) ? $parameters['lang'] : 'en',
+                        'location'=> isset(
+                            $parameters['location']
+                        ) ? $parameters['location'] : [],
+                        // 'originalRequest'=> "",
+                        'query'=> array($query),
+                        // 'resetContexts'=> "",
+                        'sessionId' => $this->_session_id,
+                        'timezone'=>  isset(
+                            $parameters['timezone']
+                        ) ? $parameters['timezone'] : ''
+                    )
+                )
             )
         );
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $data = array(
-            'query' => array($query), 'lang' => 'en',
-            'sessionId' => $this->_session_id
-        );
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
         $response = curl_exec($curl);
         curl_close($curl);
         if ($return_as_json) {
