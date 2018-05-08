@@ -23,11 +23,21 @@ class Client
      */
     private $_session_id;
 
+    /**
+     * API protocol version. Library developed using protocol version 20170712
+     * https://dialogflow.com/docs/reference/agent/#protocol_version
+     * 
+     * @var    string
+     * @access private
+     */
+    private $_protocol_version = '20170712';
 
+
+    
     /**
      * Initialises a new client object qualified to query a Dialogflow agent.
      *
-     * @param string        $_token     The developer access token for the agent.
+     * @param string        $_token      The developer access token for the agent.
      * @param string|number $_session_id Current session id.
      * 
      * @throws ClientException When no $_token is provided.
