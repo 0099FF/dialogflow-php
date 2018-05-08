@@ -109,6 +109,71 @@ class Client
         return json_decode($response);
     }
 
+
+    /**
+     * Retrieves the specified contexts for the current session.
+     *
+     * @return string JSON encoded string containing contexts for the current 
+     *                session.
+     */
+    public function getContexts() 
+    {
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl, array(
+                CURLOPT_RETURNTRANSFER=>true,
+                CURLOPT_URL=>'https://api.dialogflow.com/v1/contexts?v='.
+                    $this->_protocol_version.'&sessionId='.$this->_session_id,
+                CURLOPT_HTTPHEADER=>array(
+                    'Content-Type: application/json', 
+                    'Authorization: Bearer '.$this->_token
+                )
+            )
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
+    }
+
+
+    /**
+     * Adds a new active context to the specified session.
+     *
+     * @param integer $lifespan   The number of queries this context will remain 
+     *                            active after being invoked.
+     * @param string  $name       The name of the context.
+     * @param array   $parameters Key/value pairs of parameters being passed through 
+     *                            the context.
+     * 
+     * @return void
+     * @todo   Verify context was created.
+     */
+    public function createContext($lifespan, $name, $parameters=[]) 
+    {
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl, array(
+                CURLOPT_RETURNTRANSFER=>true,
+                CURLOPT_URL=>'https://api.dialogflow.com/v1/contexts?v='.
+                    $this->_protocol_version.'&sessionId='.$this->_session_id,
+                CURLOPT_HTTPHEADER=>array(
+                    'Content-Type: application/json', 
+                    'Authorization: Bearer '.$this->_token
+                ),
+                CURLOPT_POST=>true,
+                CURLOPT_POSTFIELDS=>json_encode(
+                    array(
+                        'lifespan'=>$lifespan, 
+                        'name'=>$name, 
+                        'parameters'=>$parameters
+                    )
+                )
+            )
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+    }
+
 }
 
 ?>
