@@ -45,7 +45,7 @@ class Client
     public function __construct($_token = null, $_session_id = 0)
     {
         if ($_token === null) {
-            $msg = 'No token provided. Interaction with an agent requires its ' /
+            $msg = 'No token provided. Interaction with an agent requires a ' /
             'developer access token';
             throw new ClientException($msg);
         } else {
@@ -155,7 +155,7 @@ class Client
 
 
     /**
-     * Adds a new active context to the specified session.
+     * Adds a new active context to the current session.
      *
      * @param integer $lifespan   The number of queries this context will remain 
      *                            active after being invoked.
@@ -164,7 +164,7 @@ class Client
      *                            the context.
      * 
      * @return void
-     * @todo   Verify context was created.
+     * @todo   Verify context was created. Check the status returned: https://dialogflow.com/docs/reference/agent/contexts#post_put_and_delete_responses
      */
     public function createContext($lifespan, $name, $parameters=[]) 
     {
@@ -192,8 +192,32 @@ class Client
         curl_close($curl);
     }
 
+
+    /**
+     * Deletes all active contexts from the current session.
+     *
+     * @return string JSON encoded string containing status code and error type.
+     */
+    public function deleteContexts()
+    {
+        $curl = curl_init();
+        curl_setopt_array(
+            $curl, array(
+                CURLOPT_RETURNTRANSFER=>true,
+                CURLOPT_URL=>'https://api.dialogflow.com/v1/contexts?v='.
+                    $this->_protocol_version.'&sessionId='.$this->_session_id,
+                CURLOPT_HTTPHEADER=>array(
+                    'Content-Type: application/json', 
+                    'Authorization: Bearer '.$this->_token
+                ),
+                CURLOPT_CUSTOMREQUEST=>"DELETE"
+            )
+        );
+        $response = curl_exec($curl);
+        curl_close($curl);
+        return $response;
+    }
+
 }
 
 ?>
-
-
